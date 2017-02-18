@@ -1,0 +1,18 @@
+LIBRS232_0.1 {
+    global:
+        rs232_get_last_error;
+        rs232_strerror;
+        rs232_ref;
+        rs232_unref;
+        rs232_open;
+        rs232_close;
+        rs232_putc;
+        rs232_getc;
+        rs232_puts;
+        rs232_flush;
+        rs232_device_name;
+        rs232_fd;
+        rs232_speed;
+    local:
+        *;
+};
