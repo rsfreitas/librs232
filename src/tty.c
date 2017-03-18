@@ -35,7 +35,7 @@
 
 static void tty_close(struct rs232_s *rs232);
 
-static void destroy_rs232_s(const struct cref_s *ref)
+static void destroy_rs232_s(const struct cl_ref_s *ref)
 {
     struct rs232_s *s = cl_container_of(ref, struct rs232_s, ref);
 
@@ -272,7 +272,7 @@ __PUB_API__ rs232_t *rs232_ref(rs232_t *rs232)
         return NULL;
     }
 
-    cref_inc(&s->ref);
+    cl_ref_inc(&s->ref);
 
     return rs232;
 }
@@ -288,7 +288,7 @@ __PUB_API__ int rs232_unref(rs232_t *rs232)
         return -1;
     }
 
-    cref_dec(&s->ref);
+    cl_ref_dec(&s->ref);
 
     return 0;
 }

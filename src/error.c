@@ -27,21 +27,21 @@
 #include "librs232.h"
 
 static const char *__description[] = {
-    tr_noop("Ok"),
-    tr_noop("Internal memory allocation error"),
-    tr_noop("Invalid argument"),
-    tr_noop("The device is not a valid RS232 device"),
-    tr_noop("Unable to open the device"),
-    tr_noop("Unable to lock the device"),
-    tr_noop("The device was not properly initialized"),
-    tr_noop("Error while writing into the device"),
-    tr_noop("Unsupported speed"),
-    tr_noop("Error reading from the device"),
-    tr_noop("Timeout while reading from the device")
+    cl_tr_noop("Ok"),
+    cl_tr_noop("Internal memory allocation error"),
+    cl_tr_noop("Invalid argument"),
+    cl_tr_noop("The device is not a valid RS232 device"),
+    cl_tr_noop("Unable to open the device"),
+    cl_tr_noop("Unable to lock the device"),
+    cl_tr_noop("The device was not properly initialized"),
+    cl_tr_noop("Error while writing into the device"),
+    cl_tr_noop("Unsupported speed"),
+    cl_tr_noop("Error reading from the device"),
+    cl_tr_noop("Timeout while reading from the device")
 };
 
-static const char *__unknown_error = tr_noop("Unknown error");
-#define __errno         (*cerrno_storage())
+static const char *__unknown_error = cl_tr_noop("Unknown error");
+#define __errno         (*cl_errno_storage())
 
 void errno_clear(void)
 {

@@ -60,7 +60,7 @@ struct rs232_s {
     int                 bytes_read;
     int                 returned_byte;
 
-    struct cref_s       ref;
+    struct cl_ref_s     ref;
 };
 
 #endif
