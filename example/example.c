@@ -3,7 +3,7 @@
  * Description:
  *
  * Author: Rodrigo Freitas
- * Created at: Fri Feb 17 09:50:15 2017
+ * Created at: Sat Apr  1 22:20:49 2017
  * Project: librs232
  *
  * Copyright (C) 2017 Rodrigo Freitas
@@ -24,38 +24,45 @@
  * USA
  */
 
-#ifndef _LIBRS232_H
-#define _LIBRS232_H         1
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
-#ifndef _STDBOOL_H
-# include <stdbool.h>
-#endif
+#include "librs232.h"
 
-/** Port speed */
-enum rs232_speed {
-    RS232_SPD_UNKNOWN,
-    RS232_SPD_4800,
-    RS232_SPD_9600,
-    RS232_SPD_19200,
-    RS232_SPD_38400,
-    RS232_SPD_115200
-};
+int main(int argc, char **argv)
+{
+    rs232_t *dev = NULL;
+    const char *opt = "d:\0";
+    int option;
+    char *device = NULL;
 
-#ifdef LIBRS232_COMPILE
-# define MAJOR_VERSION      0
-# define MINOR_VERSION      1
-# define RELEASE            2
+    do {
+        option = getopt(argc, argv, opt);
 
-# include "rs232_lib/r_internal.h"
-#endif
+        switch (option) {
+            case 'd':
+                device = strdup(optarg);
+                break;
 
-/** RS232 port object */
-typedef void                rs232_t;
+            case '?':
+                return -1;
+        }
+    } while (option != -1);
 
-#include "rs232_lib/r_error.h"
-#include "rs232_lib/r_utils.h"
-#include "rs232_lib/r_info.h"
-#include "rs232_lib/r_tty.h"
+    dev = rs232_open(device, RS232_SPD_115200);
 
-#endif
+    if (NULL == dev) {
+        printf("(1): %s\n", rs232_strerror(rs232_get_last_error()));
+        return -1;
+    }
+
+    rs232_close(dev);
+
+    if (device != NULL)
+        free(device);
+
+    return 0;
+}
 

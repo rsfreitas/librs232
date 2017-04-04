@@ -28,7 +28,7 @@
 #define _LIBRS232_R_UTILS_H          1
 
 #ifndef LIBRS232_COMPILE
-# ifdef _LIBRS232_H
+# ifndef _LIBRS232_H
 #  error "Never use <r_utils.h> directly; include <librs232.h> instead."
 # endif
 #endif
