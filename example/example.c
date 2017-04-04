@@ -29,13 +29,29 @@
 #include <string.h>
 #include <unistd.h>
 
+/* Change this to the libcollections */
+#include <signal.h>
+
+#include <collections.h>
+
 #include "librs232.h"
+
+static bool __finish = false;
+
+static void trap_signal(int sign)
+{
+    switch (sign) {
+        case SIGINT:
+            __finish = true;
+            break;
+    }
+}
 
 int main(int argc, char **argv)
 {
     rs232_t *dev = NULL;
     const char *opt = "d:\0";
-    int option;
+    int option, c;
     char *device = NULL;
 
     do {
@@ -51,6 +67,7 @@ int main(int argc, char **argv)
         }
     } while (option != -1);
 
+    cl_init(NULL);
     dev = rs232_open(device, RS232_SPD_115200);
 
     if (NULL == dev) {
@@ -58,7 +75,21 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    cl_trap(SIGINT, trap_signal);
+
+    while (1) {
+        if (__finish)
+            break;
+
+        cl_msleep(1);
+        c = rs232_getc(dev, false);
+
+        if (c != -1)
+            printf("leu: %02x\n", c);
+    }
+
     rs232_close(dev);
+    cl_uninit();
 
     if (device != NULL)
         free(device);

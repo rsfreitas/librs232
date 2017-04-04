@@ -78,7 +78,7 @@ bool is_tty_device(const char *device)
     if (stat(device, &st) < 0)
         return false;
 
-    if (S_ISCHR(st.st_mode) == 0)
+    if (S_ISCHR(st.st_mode))
         return true;
 
     return false;

@@ -296,6 +296,7 @@ __PUB_API__ int rs232_unref(rs232_t *rs232)
 __PUB_API__ rs232_t *rs232_open(const char *device, enum rs232_speed speed)
 {
     struct rs232_s *s = NULL;
+    int error;
 
     errno_clear();
 
@@ -320,7 +321,10 @@ __PUB_API__ rs232_t *rs232_open(const char *device, enum rs232_speed speed)
     return s;
 
 end_block:
+    error = rs232_get_last_error();
     rs232_unref(s);
+    errno_set(error);
+
     return NULL;
 }
 
