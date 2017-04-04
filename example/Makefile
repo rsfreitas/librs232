@@ -6,7 +6,7 @@ INCLUDEDIR = -I../include
 CFLAGS = -Wall -O0 -ggdb -fgnu89-inline -D_GNU_SOURCE $(INCLUDEDIR)
 
 LIBDIR = -L/usr/local/lib
-LIBS = -lrs232
+LIBS = -lrs232 -lcollections
 
 OBJECTS =	\
 	example.o
