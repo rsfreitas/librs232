@@ -44,7 +44,7 @@ enum rs232_speed {
 #ifdef LIBRS232_COMPILE
 # define MAJOR_VERSION      0
 # define MINOR_VERSION      1
-# define RELEASE            2
+# define RELEASE            3
 
 # include "rs232/r_internal.h"
 #endif

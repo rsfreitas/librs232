@@ -30,6 +30,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <linux/serial.h>
 
 #include "librs232.h"
 
@@ -80,6 +82,7 @@ static int tty_open(struct rs232_s *rs232, const char *device,
     enum rs232_speed speed)
 {
     struct termios tio;
+    struct serial_struct ss;
 
     if (is_tty_device(device) == false) {
         errno_set(RS232_NO_TTY_DEVICE);
@@ -99,44 +102,23 @@ static int tty_open(struct rs232_s *rs232, const char *device,
     }
 
     fcntl(rs232->fd, F_SETFL, 0);
-    tcgetattr(rs232->fd, &tio);
+    tcgetattr(rs232->fd, &rs232->old_termios);
+    memset(&tio, 0, sizeof(struct termios));
 
-    tio.c_iflag &= ~BRKINT;
-    tio.c_iflag &= ~ICRNL;
-    tio.c_iflag &= ~INLCR;
-    tio.c_iflag &= ~INPCK;
-    tio.c_iflag &= ~PARMRK;
-    tio.c_iflag &= ~ISTRIP;
-    tio.c_iflag &= ~IXON;
-    tio.c_iflag &= ~IGNCR;
-    tio.c_iflag &= ~IGNPAR;
-    tio.c_iflag |= IGNBRK;
-    tio.c_iflag |= IXOFF;
-
-    tio.c_oflag &= ~ONLCR;
-    tio.c_oflag &= ~OCRNL;
-    tio.c_oflag &= ~ONLRET;
-    tio.c_oflag &= ~OPOST;
-    tio.c_oflag &= ~ONOCR;
-
-    tio.c_cflag &= ~HUPCL;
-    tio.c_cflag &= ~PARENB;
-    tio.c_cflag &= ~PARODD;
-    tio.c_cflag &= ~CRTSCTS;
-    tio.c_cflag &= ~CSTOPB;
-    tio.c_cflag |= CLOCAL;
-    tio.c_cflag |= CREAD;
-    tio.c_cflag |= CS8;
-
+    /* Sets our RS232 configuration */
+    tio.c_oflag = 0;
     tio.c_lflag = 0;
+    tio.c_iflag |= (IGNBRK | IGNPAR);
+    tio.c_cflag |= (CS8 | CREAD | CLOCAL |
+                    rs232_speed_to_termios_speed(speed));
 
     tio.c_cc[VMIN] = 1;
     tio.c_cc[VTIME] = 0;
 
-    cfsetispeed(&tio, rs232_speed_to_termios_speed(speed));
-    cfsetospeed(&tio, rs232_speed_to_termios_speed(speed));
-
     tcsetattr(rs232->fd, TCSANOW, &tio);
+    ioctl(rs232->fd, TIOCGSERIAL, &ss);
+    ss.flags |= ASYNC_LOW_LATENCY;
+    ioctl(rs232->fd, TIOCSSERIAL, &ss);
     tcflush(rs232->fd, TCIOFLUSH);
 
     rs232->device = strdup(device);
@@ -146,23 +128,25 @@ static int tty_open(struct rs232_s *rs232, const char *device,
     return 0;
 }
 
-static void tty_close(struct rs232_s *rs232)
-{
-    if ((rs232->fd == -1) || (rs232->active == false))
-        return;
-
-    lockf(rs232->fd, F_ULOCK, 0);
-    close(rs232->fd);
-
-    rs232->active = false;
-}
-
 static void tty_flush(struct rs232_s *rs232)
 {
     if ((rs232->fd == -1) || (rs232->active == false))
         return;
 
     tcflush(rs232->fd, TCIFLUSH);
+}
+
+static void tty_close(struct rs232_s *rs232)
+{
+    if ((rs232->fd == -1) || (rs232->active == false))
+        return;
+
+    tty_flush(rs232);
+    tcsetattr(rs232->fd, TCSANOW, &rs232->old_termios);
+    lockf(rs232->fd, F_ULOCK, 0);
+    close(rs232->fd);
+
+    rs232->active = false;
 }
 
 static int __putc(struct rs232_s *rs232, unsigned char byte)

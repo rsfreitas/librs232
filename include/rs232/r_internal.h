@@ -27,6 +27,10 @@
 #ifndef _LIBRS232_R_INTERNAL_H
 #define _LIBRS232_R_INTERNAL_H          1
 
+#ifndef _TERMIOS_H
+# include <termios.h>
+#endif
+
 #ifndef _COLLECTIONS_H
 # include <collections.h>
 #endif
@@ -54,6 +58,7 @@ struct rs232_s {
     enum rs232_speed    speed;
     int                 minor;
     bool                active;
+    struct termios      old_termios;
 
     /* Read informations */
     char                read_buffer[MAX_INTERNAL_BUFFER];
