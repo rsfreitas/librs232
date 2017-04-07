@@ -1,4 +1,5 @@
-.PHONY: shared static clean dest_clean install outputdirs
+.PHONY: shared static clean dest_clean install outputdirs dev_install \
+    install_headers uninstall
 
 CC = gcc
 AR = ar
@@ -70,4 +71,15 @@ install:
 outputdirs: $(OUTPUTDIR)
 $(OUTPUTDIR):
 	mkdir -p $(OUTPUTDIR)
+
+install_headers:
+	$(shell [ ! -d /usr/local/include/rs232 ] && mkdir -p /usr/local/include/rs232)
+	$(shell for f in `ls ../include/rs232 | egrep -v '^r_internal'`; do cp -f ../include/rs232/$$f /usr/local/include/rs232; done)
+	cp -f ../include/librs232.h /usr/local/include
+
+dev_install: install_headers install
+
+uninstall: dest_clean
+	rm -rf /usr/local/include/rs232
+	rm -f /usr/local/include/librs232.h
 

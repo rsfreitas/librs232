@@ -46,16 +46,16 @@ enum rs232_speed {
 # define MINOR_VERSION      1
 # define RELEASE            2
 
-# include "rs232_lib/r_internal.h"
+# include "rs232/r_internal.h"
 #endif
 
 /** RS232 port object */
 typedef void                rs232_t;
 
-#include "rs232_lib/r_error.h"
-#include "rs232_lib/r_utils.h"
-#include "rs232_lib/r_info.h"
-#include "rs232_lib/r_tty.h"
+#include "rs232/r_error.h"
+#include "rs232/r_utils.h"
+#include "rs232/r_info.h"
+#include "rs232/r_tty.h"
 
 #endif
 
